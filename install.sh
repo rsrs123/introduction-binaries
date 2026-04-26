@@ -114,7 +114,10 @@ case "$OS" in
     DEST="$INSTALL_DIR/$APP_BASENAME"
 
     if [ -d "$DEST" ]; then
-      say "$YELLOW" "  Eliminando versión anterior en $DEST"
+      say "$YELLOW" "  → Versión anterior detectada — actualizando $DEST"
+      # Cierra app si está corriendo (silencioso si no)
+      osascript -e 'quit app "Introduction"' 2>/dev/null || true
+      sleep 1
       rm -rf "$DEST"
     fi
 
