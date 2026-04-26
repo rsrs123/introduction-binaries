@@ -128,6 +128,31 @@ case "$OS" in
     say "$CYAN" "→ Quitando Gatekeeper quarantine (binario unsigned)..."
     xattr -cr "$DEST" 2>/dev/null || true
 
+    # Reemplazar Introduction.icns con el correcto.
+    # VSCodium build sobrescribe nuestro icns durante prepare_vscode.sh.
+    # Workaround: descargamos el icns correcto del Release y lo aplicamos al .app.
+    say "$CYAN" "→ Aplicando icono Introduction (workaround VSCodium override)..."
+    ICNS_URL="https://github.com/$REPO/releases/download/$TAG/introduction.icns"
+    ICNS_DEST="$DEST/Contents/Resources/Introduction.icns"
+    if curl -fsSL -o "$TMP/introduction.icns" "$ICNS_URL" 2>/dev/null; then
+      if [ -s "$TMP/introduction.icns" ]; then
+        cp "$TMP/introduction.icns" "$ICNS_DEST"
+        ok "Icono Introduction aplicado"
+
+        # Limpiar cache iconos macOS (sudo si está disponible)
+        if [ -t 0 ] && command -v sudo >/dev/null 2>&1; then
+          say "$CYAN" "→ Limpiando icon cache de macOS (requiere sudo)..."
+          if sudo -n true 2>/dev/null || sudo -v; then
+            sudo rm -rf /Library/Caches/com.apple.iconservices.store 2>/dev/null || true
+            killall Dock Finder 2>/dev/null || true
+            ok "Icon cache limpiado — Dock + Finder reiniciados"
+          fi
+        fi
+      fi
+    else
+      say "$YELLOW" "  ⚠ No se pudo descargar el icono nuevo (no crítico)"
+    fi
+
     ok "Instalado en $DEST"
     echo ""
     say "$GREEN$BOLD" "🎯 Introduction instalado correctamente."
