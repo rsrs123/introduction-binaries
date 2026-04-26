@@ -169,11 +169,16 @@ case "$OS" in
 
     # Instalar .vsix actualizado de int-ai-extension (con wizard Cursor migration)
     VSIX_URL="https://github.com/$REPO/releases/download/$TAG/int-ai-extension-0.2.0.vsix"
-    INTRO_CLI="$DEST/Contents/Resources/app/bin/codium"
-    [ -x "$INTRO_CLI" ] || INTRO_CLI="$DEST/Contents/Resources/app/bin/code"
+    INTRO_CLI="$DEST/Contents/Resources/app/bin/introduction"
     if curl -fsSL -o "$TMP/int-ext.vsix" "$VSIX_URL" 2>/dev/null && [ -x "$INTRO_CLI" ]; then
-      "$INTRO_CLI" --install-extension "$TMP/int-ext.vsix" --force >/dev/null 2>&1 \
-        && ok "int-ai-extension v0.2.0 instalada (con Cursor migration wizard)"
+      say "$CYAN" "→ Instalando int-ai-extension v0.2.0..."
+      if "$INTRO_CLI" --install-extension "$TMP/int-ext.vsix" --force; then
+        ok "int-ai-extension v0.2.0 instalada (con Cursor migration wizard)"
+      else
+        warn "Fallo instalando .vsix — el wizard se ejecutará desde la versión built-in"
+      fi
+    else
+      warn ".vsix download fallo o CLI no encontrado en $INTRO_CLI"
     fi
 
       # Limpiar cache iconos macOS (sudo opcional)

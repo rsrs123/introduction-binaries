@@ -150,8 +150,7 @@ try {
 Write-Step "Instalando int-ai-extension v0.2.0 (Cursor migration wizard)..."
 $vsixUrl = "https://github.com/$REPO/releases/download/$tag/int-ai-extension-0.2.0.vsix"
 $vsixPath = Join-Path $tmpDir "int-ai-extension.vsix"
-$cliBin = Join-Path $INSTALL_DIR "bin\codium.cmd"
-if (-not (Test-Path $cliBin)) { $cliBin = Join-Path $INSTALL_DIR "bin\introduction.cmd" }
+$cliBin = Join-Path $INSTALL_DIR "bin\introduction.cmd"
 try {
   Invoke-WebRequest -Uri $vsixUrl -OutFile $vsixPath -UseBasicParsing -ErrorAction Stop
   if (Test-Path $cliBin) {
