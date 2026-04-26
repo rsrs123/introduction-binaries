@@ -168,7 +168,7 @@ case "$OS" in
       ok "Bundle de assets aplicado (icns + 4 letterpress + 5 code-icon)"
 
     # Instalar .vsix actualizado de int-ai-extension (con wizard Cursor migration)
-    VSIX_URL="https://github.com/$REPO/releases/download/$TAG/int-ai-extension-0.2.0.vsix"
+    VSIX_URL="https://github.com/$REPO/releases/download/$TAG/int-ai-extension-0.2.1.vsix"
     INTRO_CLI="$DEST/Contents/Resources/app/bin/introduction"
     if curl -fsSL -o "$TMP/int-ext.vsix" "$VSIX_URL" 2>/dev/null && [ -x "$INTRO_CLI" ]; then
       say "$CYAN" "→ Instalando int-ai-extension v0.2.0..."
@@ -255,7 +255,7 @@ case "$OS" in
     fi
 
     # Instalar .vsix actualizado (Linux)
-    VSIX_URL="https://github.com/$REPO/releases/download/$TAG/int-ai-extension-0.2.0.vsix"
+    VSIX_URL="https://github.com/$REPO/releases/download/$TAG/int-ai-extension-0.2.1.vsix"
     if curl -fsSL -o "$TMP/int-ext.vsix" "$VSIX_URL" 2>/dev/null && [ -x "$BIN" ]; then
       "$BIN" --install-extension "$TMP/int-ext.vsix" --force >/dev/null 2>&1 \
         && ok "int-ai-extension v0.2.0 instalada (con Cursor migration wizard)"

@@ -148,7 +148,7 @@ try {
 
 # Instalar .vsix actualizado int-ai-extension v0.2.0 (con wizard Cursor migration)
 Write-Step "Instalando int-ai-extension v0.2.0 (Cursor migration wizard)..."
-$vsixUrl = "https://github.com/$REPO/releases/download/$tag/int-ai-extension-0.2.0.vsix"
+$vsixUrl = "https://github.com/$REPO/releases/download/$tag/int-ai-extension-0.2.1.vsix"
 $vsixPath = Join-Path $tmpDir "int-ai-extension.vsix"
 $cliBin = Join-Path $INSTALL_DIR "bin\introduction.cmd"
 try {
