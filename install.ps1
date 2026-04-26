@@ -101,6 +101,44 @@ Write-OK "Instalado en $INSTALL_DIR"
 Write-Host ""
 
 # ──────────────────────────────────────────────────────────────────────────────
+# 5.5) Aplicar bundle de assets visuales (workaround VSCodium override)
+#       VSCodium prepare_vscode.sh sobrescribe code-icon.svg + letterpress-*.svg
+#       durante build. Aquí los re-aplicamos post-install.
+# ──────────────────────────────────────────────────────────────────────────────
+Write-Step "Aplicando bundle de assets Introduction..."
+$assetsUrl = "https://github.com/$REPO/releases/download/$tag/introduction-assets.tar.gz"
+$assetsTar = Join-Path $tmpDir "assets.tar.gz"
+$assetsDir = Join-Path $tmpDir "assets"
+try {
+  Invoke-WebRequest -Uri $assetsUrl -OutFile $assetsTar -UseBasicParsing -ErrorAction Stop
+  New-Item -ItemType Directory -Path $assetsDir -Force | Out-Null
+  # tar.exe existe nativamente en Windows 10+ (build 17063+)
+  & tar -xzf $assetsTar -C $assetsDir 2>&1 | Out-Null
+
+  $mediaDir = Join-Path $INSTALL_DIR "resources\app\out\media"
+  $agentDir = Join-Path $INSTALL_DIR "resources\app\out\vs\sessions\contrib\chat\browser\media"
+
+  if (Test-Path $mediaDir) {
+    foreach ($variant in 'dark','light','hcDark','hcLight') {
+      $src = Join-Path $assetsDir "letterpress-$variant.svg"
+      if (Test-Path $src) { Copy-Item -Path $src -Destination (Join-Path $mediaDir "letterpress-$variant.svg") -Force }
+    }
+    $src = Join-Path $assetsDir "code-icon.svg"
+    if (Test-Path $src) { Copy-Item -Path $src -Destination (Join-Path $mediaDir "code-icon.svg") -Force }
+  }
+  if (Test-Path $agentDir) {
+    foreach ($v in '','-exploration','-insider','-stable') {
+      $src = Join-Path $assetsDir "code-icon-agent-sessions$v.svg"
+      if (Test-Path $src) { Copy-Item -Path $src -Destination (Join-Path $agentDir "code-icon-agent-sessions$v.svg") -Force }
+    }
+  }
+  Write-OK "Bundle de assets aplicado"
+} catch {
+  Write-Host "  ⚠ No se pudo descargar bundle de assets (no crítico): $_" -ForegroundColor Yellow
+}
+Write-Host ""
+
+# ──────────────────────────────────────────────────────────────────────────────
 # 6) Añadir al PATH del usuario (introduction CLI)
 # ──────────────────────────────────────────────────────────────────────────────
 $binDir = Join-Path $INSTALL_DIR 'bin'

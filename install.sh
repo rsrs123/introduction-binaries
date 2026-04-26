@@ -208,8 +208,37 @@ case "$OS" in
     rm -rf "$INSTALL_DIR/Introduction-linux-x64"
     tar -xzf "$DOWNLOAD_PATH" -C "$INSTALL_DIR"
 
-    BIN="$INSTALL_DIR/Introduction-linux-x64/bin/introduction"
+    APP_ROOT="$INSTALL_DIR/Introduction-linux-x64"
+    BIN="$APP_ROOT/bin/introduction"
     chmod +x "$BIN"
+
+    # Aplicar bundle de assets visuales (mismo workaround que macOS).
+    say "$CYAN" "→ Aplicando bundle de assets Introduction..."
+    ASSETS_URL="https://github.com/$REPO/releases/download/$TAG/introduction-assets.tar.gz"
+    if curl -fsSL -o "$TMP/assets.tar.gz" "$ASSETS_URL" 2>/dev/null && [ -s "$TMP/assets.tar.gz" ]; then
+      mkdir -p "$TMP/assets"
+      tar -xzf "$TMP/assets.tar.gz" -C "$TMP/assets"
+
+      MEDIA_DIR="$APP_ROOT/resources/app/out/media"
+      AGENT_DIR="$APP_ROOT/resources/app/out/vs/sessions/contrib/chat/browser/media"
+
+      [ -d "$MEDIA_DIR" ] && {
+        for variant in dark light hcDark hcLight; do
+          cp "$TMP/assets/letterpress-${variant}.svg" "$MEDIA_DIR/letterpress-${variant}.svg" 2>/dev/null || true
+        done
+        cp "$TMP/assets/code-icon.svg" "$MEDIA_DIR/code-icon.svg" 2>/dev/null || true
+      }
+      [ -d "$AGENT_DIR" ] && {
+        for v in "" "-exploration" "-insider" "-stable"; do
+          cp "$TMP/assets/code-icon-agent-sessions${v}.svg" "$AGENT_DIR/code-icon-agent-sessions${v}.svg" 2>/dev/null || true
+        done
+      }
+      # Icon Linux: code.png en .desktop entry + en resources
+      LINUX_RES="$APP_ROOT/resources/linux"
+      [ -d "$LINUX_RES" ] && cp "$TMP/assets/code.png" "$LINUX_RES/code.png" 2>/dev/null || true
+
+      ok "Bundle de assets aplicado"
+    fi
 
     # Symlink en ~/.local/bin/ si está en el PATH
     if [ -d "$HOME/.local/bin" ] && echo "$PATH" | grep -qF "$HOME/.local/bin"; then
