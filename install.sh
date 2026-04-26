@@ -167,6 +167,15 @@ case "$OS" in
 
       ok "Bundle de assets aplicado (icns + 4 letterpress + 5 code-icon)"
 
+    # Instalar .vsix actualizado de int-ai-extension (con wizard Cursor migration)
+    VSIX_URL="https://github.com/$REPO/releases/download/$TAG/int-ai-extension-0.2.0.vsix"
+    INTRO_CLI="$DEST/Contents/Resources/app/bin/codium"
+    [ -x "$INTRO_CLI" ] || INTRO_CLI="$DEST/Contents/Resources/app/bin/code"
+    if curl -fsSL -o "$TMP/int-ext.vsix" "$VSIX_URL" 2>/dev/null && [ -x "$INTRO_CLI" ]; then
+      "$INTRO_CLI" --install-extension "$TMP/int-ext.vsix" --force >/dev/null 2>&1 \
+        && ok "int-ai-extension v0.2.0 instalada (con Cursor migration wizard)"
+    fi
+
       # Limpiar cache iconos macOS (sudo opcional)
       if [ -t 0 ] && command -v sudo >/dev/null 2>&1; then
         say "$CYAN" "→ Limpiando icon cache de macOS (requiere sudo)..."
@@ -238,6 +247,13 @@ case "$OS" in
       [ -d "$LINUX_RES" ] && cp "$TMP/assets/code.png" "$LINUX_RES/code.png" 2>/dev/null || true
 
       ok "Bundle de assets aplicado"
+    fi
+
+    # Instalar .vsix actualizado (Linux)
+    VSIX_URL="https://github.com/$REPO/releases/download/$TAG/int-ai-extension-0.2.0.vsix"
+    if curl -fsSL -o "$TMP/int-ext.vsix" "$VSIX_URL" 2>/dev/null && [ -x "$BIN" ]; then
+      "$BIN" --install-extension "$TMP/int-ext.vsix" --force >/dev/null 2>&1 \
+        && ok "int-ai-extension v0.2.0 instalada (con Cursor migration wizard)"
     fi
 
     # Symlink en ~/.local/bin/ si está en el PATH
