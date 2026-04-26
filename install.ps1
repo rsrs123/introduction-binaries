@@ -10,6 +10,13 @@
 
 $ErrorActionPreference = 'Stop'
 
+# UTF-8 en consola para que los caracteres ✓ ✗ → → → no salgan como ???
+try { [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new() } catch {}
+try { $OutputEncoding = [System.Text.UTF8Encoding]::new() } catch {}
+
+# Acelera Invoke-WebRequest (sin barra de progreso default = ~10x más rápido)
+$ProgressPreference = 'Continue'
+
 $REPO        = 'rsrs123/introduction-binaries'
 $APP_NAME    = 'Introduction'
 $INSTALL_DIR = Join-Path $env:LOCALAPPDATA "Programs\$APP_NAME"
@@ -76,10 +83,12 @@ Write-Host ""
 # ──────────────────────────────────────────────────────────────────────────────
 # 4) Cerrar app si está corriendo (idempotente)
 # ──────────────────────────────────────────────────────────────────────────────
-Get-Process -Name 'Introduction' -ErrorAction SilentlyContinue | ForEach-Object {
-  Write-Step "Cerrando proceso Introduction.exe (PID $($_.Id))..."
-  $_ | Stop-Process -Force
-  Start-Sleep -Seconds 1
+# Cierra TODAS las instancias de Introduction.exe (incluso de carpetas viejas)
+$procs = Get-Process -Name 'Introduction' -ErrorAction SilentlyContinue
+if ($procs) {
+  Write-Step "Cerrando $(($procs).Count) proceso(s) Introduction.exe..."
+  $procs | Stop-Process -Force -ErrorAction SilentlyContinue
+  Start-Sleep -Seconds 2
 }
 
 # ──────────────────────────────────────────────────────────────────────────────
